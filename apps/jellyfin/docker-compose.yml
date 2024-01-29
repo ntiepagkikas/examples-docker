@@ -1,0 +1,27 @@
+version: "2.1"
+
+services:
+  apps-jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: apps-jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=TIMEZONE
+    volumes:
+      - ./config:/config
+      - /mnt/data:/data:rshared # Media library
+      #### Override Assets for a little more customization
+      - ./assets/favicon.png:/usr/share/jellyfin/web/favicon.png:ro
+      - ./assets/favicon.ico:/usr/share/jellyfin/web/favicon.ico:ro
+      - ./assets/favicon.ico:/usr/share/jellyfin/web/bc8d51405ec040305a87.ico:ro
+      - ./assets/favicon.png:/usr/share/jellyfin/web/assets/img/banner-dark.png:ro
+      - ./assets/favicon.png:/usr/share/jellyfin/web/assets/img/banner-light.png:ro
+      - ./assets/favicon.png:/usr/share/jellyfin/web/assets/img/icon-transparent.png:ro
+    expose:
+      - "8096"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "4"

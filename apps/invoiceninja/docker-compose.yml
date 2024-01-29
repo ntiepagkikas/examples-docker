@@ -1,0 +1,75 @@
+version: "2.1"
+
+services:
+  invoiceninja-web:
+    image: nginx
+    container_name: invoiceninja-web
+    restart: unless-stopped
+    volumes:
+      - ./config/nginx/invoiceninja.conf:/etc/nginx/conf.d/in-vhost.conf:ro
+      - ./data/public:/var/www/app/public:ro
+    expose:
+      - 80
+    depends_on:
+      - invoiceninja-app
+    networks:
+      - invoiceninja
+
+  invoiceninja-app:
+    image: invoiceninja/invoiceninja:latest
+    container_name: invoiceninja-app
+    expose:
+      - 9000
+    volumes:
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini
+      - ./config/php/php-cli.ini:/usr/local/etc/php/php-cli.ini
+      - ./data/public:/var/www/app/public:rw,delegated
+      - ./data/storage:/var/www/app/storage:rw,delegated
+    restart: unless-stopped
+    environment:
+      - APP_URL=https://hostname.ltd
+      - APP_KEY=base64:rmlRQn7r9YvREDACTED
+      - APP_DEBUG=false
+      - REQUIRE_HTTPS=true
+      - TRUSTED_PROXIES='*'
+      - PHANTOMJS_PDF_GENERATION=false
+      - PDF_GENERATOR=snappdf
+      - QUEUE_CONNECTION=database
+      - DB_HOST=invoiceninja-db
+      - DB_PORT=3306
+      - DB_DATABASE=invoiceninja
+      - DB_USERNAME=invoiceninja
+      - DB_PASSWORD=invoiceninja
+      - IN_USER_EMAIL=example@hostname.ltd
+      - IN_PASSWORD=REDACTED
+      - MAIL_MAILER=log
+      - MAIL_HOST=mail.hostname.ltd
+      - MAIL_PORT=587
+      - MAIL_USERNAME=noreply@hostname.ltd
+      - MAIL_PASSWORD=REDACTED
+      - MAIL_ENCRYPTION=tls
+      - MAIL_FROM_ADDRESS='noreply@hostname.ltd'
+      - MAIL_FROM_NAME='invoiceninja@hostname.ltd'
+    depends_on:
+      - invoiceninja-db
+    networks:
+      - invoiceninja
+
+  invoiceninja-db:
+    container_name: invoiceninja-db
+    image: mysql:8
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=invoiceninja
+      - MYSQL_USER=invoiceninja
+      - MYSQL_PASSWORD=invoiceninja
+      - MYSQL_DATABASE=invoiceninja
+    expose:
+      - 3306
+    networks:
+      - invoiceninja
+    volumes:
+      - ./db:/var/lib/mysql
+
+networks:
+  invoiceninja:

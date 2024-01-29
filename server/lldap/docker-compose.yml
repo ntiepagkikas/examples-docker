@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  server-lldap:
+    image: lldap/lldap:stable
+    container_name: server-lldap
+    restart: unless-stopped
+    depends_on:
+      - server-lldap-db
+    expose:
+      - 3890
+      - 17170
+    volumes:
+      - "./data:/data"
+    networks:
+      - lldap
+    environment:
+      - TZ=TIMEZONE
+      - LLDAP_JWT_SECRET=''
+      - LLDAP_KEY_SEED=''
+      - LLDAP_LDAP_USER_PASS=REDACTED
+      - LLDAP_LDAP_BASE_DN=dc=hostname,dc=ltd
+      - LLDAP_DATABASE_URL=mysql://REDACTEDUSER:REDACTEDPASSWORD@server-lldap-db/REDACTEDDB
+
+  server-lldap-db:
+    container_name: server-lldap-db
+    image: mariadb:latest
+    restart: unless-stopped
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=REDACTED
+      - MYSQL_PASSWORD=REDACTEDPASSWORD
+      - MYSQL_DATABASE=REDACTEDDB
+      - MYSQL_USER=REDACTEDUSER
+    networks:
+      - lldap
+    expose:
+      - '3306'
+
+networks:
+  lldap:

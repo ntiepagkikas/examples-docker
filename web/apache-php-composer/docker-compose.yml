@@ -1,0 +1,11 @@
+version: '3.0' 
+
+services:
+  web-apache-php-composer:
+    container_name: web-apache-php-composer
+    build: .
+    volumes:
+      - ./app:/var/www
+    expose:
+      - '80'
+    restart: always

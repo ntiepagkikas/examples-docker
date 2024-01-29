@@ -1,0 +1,20 @@
+version: "2.1"
+
+services:
+  ffmpeg:
+    image: linuxserver/ffmpeg:latest
+    container_name: ffmpeg
+    volumes:
+      - ./watch:/mnt/media_watch
+      - ./output:/mnt/media_output
+    deploy:
+      resources:
+        limits:
+          cpus: "5"
+    networks:
+      - default
+
+networks:
+  default:
+    external: true
+    name: none

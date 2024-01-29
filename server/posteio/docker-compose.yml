@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  server-posteio:
+    image: analogic/poste.io
+    container_name: server-posteio
+    restart: always
+    environment:
+      - TZ=TIMEZONE
+      - VIRTUAL_HOST=mail.hostname.ltd # enter the email server hosting address
+      - HTTP_PORT=80
+      - HTTPS=ON
+      - DISABLE_ROUNDCUBE=FALSE
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data:/data
+    healthcheck:
+      disable: true
+    expose:
+      - 80
+      - 443
+    ports:
+      - '25:25'
+      - '465:465'
+      - '587:587'
+      - '993:993'

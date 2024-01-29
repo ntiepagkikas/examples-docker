@@ -1,0 +1,11 @@
+version: "2.1"
+
+services:
+  apps-managerio:
+    image: cronet/manager.io:latest
+    container_name: apps-managerio
+    volumes:
+      - ./data:/data
+    expose:
+      - '8080'
+    restart: unless-stopped

@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  apps-ariang:
+    image: hurlenko/aria2-ariang
+    container_name: apps-ariang
+    volumes:
+      - ./download:/aria2/data
+      - ./conf:/aria2/conf
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - RPC_SECRET=REDACTED
+      - ARIA2RPCPORT=443
+      - EMBED_RPC_SECRET=REDACTED
+    restart: always
+    network_mode: container:server-vpn

@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  server-tor:
+    container_name: server-tor
+    image: dockage/tor-privoxy:latest
+    expose:
+      - '9050'
+      - '9051'
+      - '8118'
+    restart: unless-stopped

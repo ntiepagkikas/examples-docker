@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  server-vpn:
+    image: qmcgaw/gluetun
+    container_name: server-vpn
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./vpnconf.conf:/gluetun/custom.conf:ro # This will be the .ovpn file downloaded from your VPN provider
+    environment:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=openvpn
+      - OPENVPN_CUSTOM_CONFIG=/gluetun/custom.conf
+      - OPENVPN_USER=REDACTED
+      - OPENVPN_PASSWORD=REDACTED
+      - HTTPPROXY=on
+      - HTTPPROXY_LOG=on
+      - SHADOWSOCKS=on
+      - SHADOWSOCKS_LOG=on
+    expose:
+      - 8888/tcp # HTTP proxy
+      - 8388/tcp # Shadowsocks
+      - 8388/udp # Shadowsocks

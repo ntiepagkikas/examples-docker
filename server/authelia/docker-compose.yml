@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  server-authelia:
+    image: authelia/authelia
+    container_name: server-authelia
+    volumes:
+      - ./config:/config
+    expose:
+      - 9091
+    restart: unless-stopped
+    environment:
+      - TZ=TIMEZONE
+    healthcheck:
+      disable: true

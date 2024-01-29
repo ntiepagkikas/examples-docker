@@ -1,0 +1,109 @@
+version: '3'
+
+services:
+  nextcloud:
+    #image: nextcloud:latest
+    build: .
+    container_name: nextcloud
+    restart: unless-stopped
+    volumes:
+      - ./html:/var/www/html
+    environment:
+      - MYSQL_DATABASE=REDACTED
+      - MYSQL_USER=REDACTED
+      - MYSQL_PASSWORD=REDACTED
+      - MYSQL_HOST=nextcloud-db
+      - NEXTCLOUD_ADMIN_USER=REDACTED
+      - NEXTCLOUD_ADMIN_PASSWORD=REDACTED
+      - REDIS_HOST=nextcloud-redis
+      - REDIS_HOST_PORT=6379
+      - REDIS_HOST_PASSWORD=REDACTED
+      - NEXTCLOUD_INIT_HTACCESS=true
+      - PHP_MEMORY_LIMIT=2G
+      - PHP_UPLOAD_LIMIT=10G
+      - SSL_KEY=/certs/host.key
+      - SSL_CSR=/certs/host.csr
+      - SSL_CERT=/certs/cert.crt
+      - OBJECTSTORE_S3_HOST=REDACTED
+      - OBJECTSTORE_S3_BUCKET=REDACTED
+      - OBJECTSTORE_S3_KEY=REDACTED
+      - OBJECTSTORE_S3_SECRET=REDACTED
+      - OBJECTSTORE_S3_PORT=443
+      - OBJECTSTORE_S3_SSL=true
+      - OBJECTSTORE_S3_REGION=auto
+      - OBJECTSTORE_S3_USEPATH_STYLE=true
+      - OBJECTSTORE_S3_OBJECT_PREFIX=uid
+      - OBJECTSTORE_S3_AUTOCREATE=true
+      - SMTP_HOST=REDACTED
+      - SMTP_SECURE=tls
+      - SMTP_PORT=587
+      - SMTP_AUTHTYPE=LOGIN
+      - SMTP_NAME=REDACTED
+      - SMTP_PASSWORD=REDACTED
+      - MAIL_FROM_ADDRESS=REDACTED
+    expose:
+      - '80'
+    networks:
+      - nextcloud
+    depends_on:
+      - nextcloud-redis
+      - nextcloud-db
+
+  nextcloud-redis:
+    container_name: nextcloud-redis
+    image: redis:latest
+    restart: unless-stopped
+    expose:
+      - '6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass REDACTED
+    volumes:
+      - ./redis:/data
+    networks:
+      - nextcloud
+
+  nextcloud-db:
+    container_name: nextcloud-db
+    image: mariadb:latest
+    restart: unless-stopped
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=REDACTED
+      - MYSQL_PASSWORD=REDACTED
+      - MYSQL_DATABASE=REDACTED
+      - MYSQL_USER=REDACTED
+    networks:
+      - nextcloud
+    expose:
+      - '3306'
+
+  nextcloud-office:
+    container_name: nextcloud-office
+    image: onlyoffice/documentserver:latest
+    restart: always
+    environment:
+      - JWT_SECRET=REDACTED
+    expose:
+      - '80'
+      - '443'
+    volumes:
+      - ./office/data:/var/www/onlyoffice/Data
+      - ./office/logs:/var/log/onlyoffice
+    networks:
+      - nextcloud
+
+  nextcloud-cron:
+    image: nextcloud:latest
+    restart: always
+    container_name: nextcloud-cron
+    volumes:
+      - ./html:/var/www/html
+    entrypoint: /cron.sh
+    depends_on:
+      - nextcloud-db
+      - nextcloud-redis
+    networks:
+      - nextcloud
+
+networks:
+  nextcloud:

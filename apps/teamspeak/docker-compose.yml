@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+  apps-teamspeak:
+    container_name: apps-teamspeak
+    image: teamspeak
+    restart: unless-stopped
+    environment:
+      - TS3SERVER_LICENSE=accept
+      - TS3SERVER_DB_PLUGIN=ts3db_mariadb
+      - TS3SERVER_DB_SQLCREATEPATH=create_mariadb
+      - TS3SERVER_DB_HOST=apps-teamspeak_db
+      - TS3SERVER_DB_USER=teamspeak
+      - TS3SERVER_DB_PASSWORD=teamspeak
+      - TS3SERVER_DB_NAME=teamspeakdb
+      - TS3SERVER_DB_WAITUNTILREADY=30
+    volumes:
+      - ./teamspeak:/var/ts3server
+    depends_on:
+      - apps-teamspeak_db
+    networks:
+      - teamspeak
+
+  apps-teamspeak_db:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=teamspeak
+      - MYSQL_PASSWORD=teamspeak
+      - MYSQL_DATABASE=teamspeakdb
+      - MYSQL_USER=teamspeak
+    volumes:
+      - ./db:/var/lib/mysql/
+    networks:
+      - teamspeak
+
+networks:
+  teamspeak:

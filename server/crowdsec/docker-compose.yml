@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    expose: 
+      - 8080
+    environment:
+      GID: "${GID-1000}"
+      COLLECTIONS: "crowdsecurity/linux crowdsecurity/traefik"
+    volumes:
+      - ./config/acquis.yaml:/etc/crowdsec/acquis.yaml
+      - ./db:/var/lib/crowdsec/data/
+      - ./config:/etc/crowdsec/
+      - ./traefik/config/logs:/var/log/traefik/:ro # Set access to the folder where Traefik stores the access logs
+    networks:
+      - crowdsec
+    restart: unless-stopped
+
+  crowdsec-traefik:
+    image: docker.io/fbonalair/traefik-crowdsec-bouncer:latest
+    container_name: crowdsec-traefik
+    expose: 
+      - 8080
+    environment:
+      CROWDSEC_BOUNCER_API_KEY: REDACTED
+      CROWDSEC_AGENT_HOST: crowdsec:8080
+    networks:
+      - crowdsec
+    depends_on:
+      - crowdsec
+    restart: unless-stopped
+
+#  crowdsec-dashboard:
+#    build: ./dashboard
+#    restart: always
+#    expose:
+#      - 3000
+#    environment:
+#      MB_DB_FILE: /data/metabase.db
+#      MGID: "${GID-1000}"
+#    depends_on:
+#      - 'crowdsec'
+#    volumes:
+#      - ./db:/metabase-data/
+
+
+networks:
+  crowdsec:

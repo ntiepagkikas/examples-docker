@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  apps-vaultwarden:
+    container_name: apps-vaultwarden
+    image: vaultwarden/server:latest
+    restart: always
+    expose:
+      - 80
+    volumes:
+      - ./data:/data
+    environment:
+      - SIGNUPS_ALLOWED=false
+      - ADMIN_TOKEN=REDACTED

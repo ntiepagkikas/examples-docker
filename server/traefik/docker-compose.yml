@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  server-traefik:
+    image: traefik:latest
+    container_name: server-traefik
+    security_opt:
+      - no-new-privileges:true
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - "8080"
+    volumes:
+      - ./config:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - traefik
+    environment:
+      # OPTIONAL
+      ## Cloudflare keys to handle SSL 
+      - CF_API_EMAIL=REDACTED
+      - CF_API_KEY=REDACTED
+      - CF_ZONE_API_TOKEN=REDACTED
+      - CF_DNS_API_TOKEN=REDACTED
+
+networks:
+  traefik:

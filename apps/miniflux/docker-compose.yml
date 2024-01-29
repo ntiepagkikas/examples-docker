@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  apps-miniflux:
+    container_name: apps-miniflux
+    image: miniflux/miniflux:latest
+    expose:
+      - "8080"
+    depends_on:
+      - apps-minifluxdb
+    environment:
+      - DATABASE_URL=postgres://REDACTEDUSER:REDACTEDPASSWORD@apps-minifluxdb/miniflux?sslmode=disable
+      - RUN_MIGRATIONS=1
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=REDACTED
+      - ADMIN_PASSWORD=REDACTED
+    networks:
+      - miniflux
+
+  apps-minifluxdb:
+    container_name: apps-minifluxdb
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=REDACTEDUSER
+      - POSTGRES_PASSWORD=REDACTEDPASSWORD
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "miniflux"]
+      interval: 10s
+      start_period: 30s
+    networks:
+      - miniflux
+
+networks:
+  miniflux:
