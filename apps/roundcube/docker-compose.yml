@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  roundcube:
+    container_name: roundcube
+    image: roundcube/roundcubemail
+    restart: unless-stopped
+    expose:
+      - "80"
+    environment:
+      - ROUNDCUBEMAIL_DEFAULT_HOST=ssl://mail.hostname.ltd
+      - ROUNDCUBEMAIL_DEFAULT_PORT=993
+      - ROUNDCUBEMAIL_SMTP_SERVER=ssl:///mail.hostname.ltd
+      - ROUNDCUBEMAIL_SMTP_PORT=465
+    volumes:
+      - ./html:/var/www/html
+      - ./config:/var/roundcube/config
