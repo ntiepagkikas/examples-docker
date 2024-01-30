@@ -1,0 +1,23 @@
+#
+#  First-Steps:
+#  Up the container ( docker-compose up -d )
+#  Execute a terminal on the pod ( docker exec -it protonmail /bin/bash )
+#  Install htop and kill all protonmail-bridge
+#  Launch entrypoint.sh init
+#  Login with your account 
+#  Get the account details from the terminal
+#
+version: '2'
+
+services:    
+  protonmail:
+    container_name: protonmail
+    image: shenxn/protonmail-bridge
+    restart: always
+    volumes:
+      - ./data:/root
+    expose:
+      - "1143"
+      - "1025"
+      - "25"
+      - "143"
