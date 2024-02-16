@@ -1,11 +1,27 @@
-version: "2.1"
+version: '3'
 
 services:
-  apps-managerio:
+  managerio:
     image: cronet/manager.io:latest
-    container_name: apps-managerio
+    container_name: managerio
     volumes:
       - ./data:/data
     expose:
       - '8080'
     restart: unless-stopped
+    networks:
+      - managerio
+
+  nginx_managerio:
+    image: nginx:latest
+    container_name: managerio_proxy
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/nginx-default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - '80:80'
+    networks:
+      - managerio
+
+networks:
+  managerio:
